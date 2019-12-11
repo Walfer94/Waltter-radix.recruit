@@ -1,0 +1,55 @@
+create table ##vendedor
+(
+id_vendedor int primary key,
+nome_vendedor varchar(100)
+)
+
+insert into ##vendedor
+values (1, 'Waltter')
+insert into ##vendedor
+values (2, 'Gabriela')
+insert into ##vendedor
+values (3, 'Pedro')
+insert into ##vendedor
+values (4, 'Lucas')
+
+select * from ##vendedor
+
+create table ##venda
+(
+venda_id int primary key,
+vendedor_id int,
+venda_data date,
+valor float
+)
+
+insert into ##venda
+values(1,1,'1994-10-10',25.6)
+insert into ##venda
+values(2,1,'1994-06-10',250.6)
+insert into ##venda
+values(3,1,'1994-08-10',2.6);
+
+insert into ##venda
+values(4,2,'2000-10-10',1.6)
+insert into ##venda
+values(5,2,'1994-06-10',2500.6)
+insert into ##venda
+values(6,2,'1994-08-10',260)
+
+insert into ##venda
+values(7,3,'2000-10-10',156.6)
+insert into ##venda
+values(8,3,'1994-06-10',25000.6)
+insert into ##venda
+values(9,3,'1994-08-10',260)
+
+
+select nome_vendedor as 'Nome Vendedor', valor_maior as 'Maior Venda', menor_valor as 'Menor Venda' from (
+select tb1.nome_vendedor as nome_vendedor,  tb1.valor_maior , d.valor as menor_valor, row_number() over (partition by tb1.nome_vendedor order by d.valor asc) num2 from 
+	(select distinct  c.id_vendedor as id_vendedor, c.nome_vendedor as nome_vendedor, a.valor as valor_maior, row_number() over (partition by c.id_vendedor order by a.valor DESC) num
+	 from ##venda a inner join ##vendedor c on a.vendedor_id = c.id_vendedor
+	 --order by nome_vendedor asc,valor asc
+	 ) tb1 inner join ##venda d on d.vendedor_id = tb1.id_vendedor
+ 	 where tb1.num = 1 ) tb2
+  where tb2.num2=1
